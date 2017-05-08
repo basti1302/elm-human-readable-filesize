@@ -10,11 +10,9 @@ format 238674052 == "238.67 MB"
 format 543 == "543 B"
 ```
 
-See [package documentation](http://package.elm-lang.org/packages/basti1302/elm-human-readable-filesize/latest) for more details and customization options.
+See [package documentation](http://package.elm-lang.org/packages/basti1302/elm-human-readable-filesize/latest/Filesize) for more details and customization options.
 
 ## Releases
 
-| Version | Notes |
-| ------- | ----- |
-| [**1.0.0**](https://github.com/basti1302/elm-human-readable-filesize/tree/1.0.0) | Initial Release
+* 1.0.0 Initial release
 
