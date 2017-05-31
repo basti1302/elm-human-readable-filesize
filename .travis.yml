@@ -3,14 +3,16 @@ sudo: false
 cache:
   directories:
     - elm-stuff/build-artifacts
+    - elm-stuff/packages
     - test/elm-stuff/build-artifacts
+    - test/elm-stuff/packages
 
 os:
   - linux
 
 env:
   matrix:
-    - ELM_VERSION=0.18 TARGET_NODE_VERSION=node
+    - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=node NODE_TEST_RUNNER_VERSION=0.18.4 ELM_OPS_TOOLING_HASH=8701cf74016281814a3da784e19b4a0117493c46
 
 before_install:
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
@@ -20,10 +22,12 @@ install:
   - nvm use $TARGET_NODE_VERSION
   - node --version
   - npm --version
-  - cd tests
-  - npm install -g elm@$ELM_VERSION elm-test
+  - npm install -g elm@$ELM_VERSION elm-test@$NODE_TEST_RUNNER_VERSION
   - git clone https://github.com/NoRedInk/elm-ops-tooling
+  - pushd elm-ops-tooling # fix elm-ops-tooling to a specific commit (reproducible builds ftw)
+  - git reset --hard $ELM_OPS_TOOLING_HASH
+  - popd
   - elm-ops-tooling/with_retry.rb elm package install --yes
 
 script:
-  - elm-test Main.elm
+  - elm-test
