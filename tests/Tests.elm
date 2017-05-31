@@ -6,11 +6,6 @@ import Fuzz exposing (..)
 import Test exposing (..)
 
 
-format2 : Int -> String
-format2 =
-    formatWith { defaultSettings | units = Base2 }
-
-
 all : Test
 all =
     describe "Human Readable File Sizes"
@@ -34,18 +29,16 @@ all =
             , test "1 TB" <| \() -> Expect.equal "1 TB" (format 1000000000000)
             , test "999.99 TB" <| \() -> Expect.equal "999.99 TB" (format 999999999999999)
             , test "1 PB" <| \() -> Expect.equal "1 PB" (format 1000000000000000)
-
-            -- TODO For very large file sizes, the implementation of
-            -- roundToDecimalPlaces can introduce rounding errors that lead to
-            -- different results. Therefore, for now, we test with
-            -- 999999999999999000 instead of 999999999999999999.
+              -- TODO For very large file sizes, the implementation of
+              -- roundToDecimalPlaces can introduce rounding errors that lead to
+              -- different results. Therefore, for now, we test with
+              -- 999999999999999000 instead of 999999999999999999.
             , test "999.99 PB" <| \() -> Expect.equal "999.99 PB" (format 999999999999999000)
             , test "1 EB" <| \() -> Expect.equal "1 EB" (format 1000000000000000000)
-
-            -- Somewhere around this (9223350000000000000) elm-format
-            -- overwrites the Int literal with garbage, possibly due to an
-            -- integer overflow. In order to keep this file editable with
-            -- elm-format enabled, we do not use larger Ints in our tests.
+              -- Somewhere around this (9223350000000000000) elm-format
+              -- overwrites the Int literal with garbage, possibly due to an
+              -- integer overflow. In order to keep this file editable with
+              -- elm-format enabled, we do not use larger Ints in our tests.
             , test "922.33 EB" <| \() -> Expect.equal "9.22 EB" (format 9223350000000000000)
             ]
         , describe "Basic negative cases"
@@ -182,23 +175,23 @@ all =
                         (formatWith { defaultSettings | decimalSeparator = "," } 238674052)
             ]
         , describe "Base 2 basic cases"
-            [ test "3 B" <| \() -> Expect.equal "3 B" (format2 3)
-            , test "100 B" <| \() -> Expect.equal "100 B" (format2 100)
-            , test "543 B" <| \() -> Expect.equal "543 B" (format2 543)
-            , test "1.61 KiB" <| \() -> Expect.equal "1.61 KiB" (format2 1657)
-            , test "227.61 MiB" <| \() -> Expect.equal "227.61 MiB" (format2 238674052)
+            [ test "3 B" <| \() -> Expect.equal "3 B" (formatBase2 3)
+            , test "100 B" <| \() -> Expect.equal "100 B" (formatBase2 100)
+            , test "543 B" <| \() -> Expect.equal "543 B" (formatBase2 543)
+            , test "1.61 KiB" <| \() -> Expect.equal "1.61 KiB" (formatBase2 1657)
+            , test "227.61 MiB" <| \() -> Expect.equal "227.61 MiB" (formatBase2 238674052)
             ]
         , describe "Base 2 edge cases"
-            [ test "1 B" <| \() -> Expect.equal "1 B" (format2 1)
-            , test "1023 B" <| \() -> Expect.equal "1023 B" (format2 1023)
-            , test "1 KiB" <| \() -> Expect.equal "1 KiB" (format2 1024)
-            , test "1023.99 KiB" <| \() -> Expect.equal "1023.99 KiB" (format2 1048575)
-            , test "1 MiB" <| \() -> Expect.equal "1 MiB" (format2 1048576)
-            , test "1023.99 MiB" <| \() -> Expect.equal "1023.99 MiB" (format2 1073741823)
-            , test "1 GiB" <| \() -> Expect.equal "1 GiB" (format2 1073741824)
-            , test "1023.99 GiB" <| \() -> Expect.equal "1023.99 GiB" (format2 1099511627775)
-            , test "1 TiB" <| \() -> Expect.equal "1 TiB" (format2 1099511627776)
-            , test "1023.99 TiB" <| \() -> Expect.equal "1023.99 TiB" (format2 1125899906842623)
-            , test "1 PiB" <| \() -> Expect.equal "1 PiB" (format2 1125899906842624)
+            [ test "1 B" <| \() -> Expect.equal "1 B" (formatBase2 1)
+            , test "1023 B" <| \() -> Expect.equal "1023 B" (formatBase2 1023)
+            , test "1 KiB" <| \() -> Expect.equal "1 KiB" (formatBase2 1024)
+            , test "1023.99 KiB" <| \() -> Expect.equal "1023.99 KiB" (formatBase2 1048575)
+            , test "1 MiB" <| \() -> Expect.equal "1 MiB" (formatBase2 1048576)
+            , test "1023.99 MiB" <| \() -> Expect.equal "1023.99 MiB" (formatBase2 1073741823)
+            , test "1 GiB" <| \() -> Expect.equal "1 GiB" (formatBase2 1073741824)
+            , test "1023.99 GiB" <| \() -> Expect.equal "1023.99 GiB" (formatBase2 1099511627775)
+            , test "1 TiB" <| \() -> Expect.equal "1 TiB" (formatBase2 1099511627776)
+            , test "1023.99 TiB" <| \() -> Expect.equal "1023.99 TiB" (formatBase2 1125899906842623)
+            , test "1 PiB" <| \() -> Expect.equal "1 PiB" (formatBase2 1125899906842624)
             ]
         ]
