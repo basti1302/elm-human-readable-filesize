@@ -1,45 +1,43 @@
 module Filesize
     exposing
-        ( defaultSettings
+        ( Settings
+        , Units(..)
+        , defaultSettings
         , format
         , formatWith
-        , Settings
-        , Units(..)
         )
 
 {-| This library converts a file size in bytes into a human readable string.
 
 Examples:
 
-```
-format 1234 == "1.23 kB"
-format 238674052 == "238.67 MB"
-format 543 == "543 B"
-```
+    format 1234 == "1.23 kB"
+    format 238674052 == "238.67 MB"
+    format 543 == "543 B"
 
 You can either use decimal units (also known as base 10 units, these are the
 default) or binary (also called base 2 or IEC units).
 
 Supported decimal units:
 
-* 1 byte     (B)
-* 1 kilobyte (kB) = 1000 bytes
-* 1 megabyte (MB) = 1000 kilobytes
-* 1 gigabyte (GB) = 1000 megabytes
-* 1 terabyte (TB) = 1000 gigabytes
-* 1 petabyte (PB) = 1000 terabytes
-* 1 exabyte  (EB) = 1000 petabyte
+  - 1 byte (B)
+  - 1 kilobyte (kB) = 1000 bytes
+  - 1 megabyte (MB) = 1000 kilobytes
+  - 1 gigabyte (GB) = 1000 megabytes
+  - 1 terabyte (TB) = 1000 gigabytes
+  - 1 petabyte (PB) = 1000 terabytes
+  - 1 exabyte (EB) = 1000 petabyte
 
 Larger decimal units (zettabyte (ZB), yottabyte (YB), ...) are not supported.
 
 Supported binary/IEC units:
 
-* 1 byte     (B)
-* 1 kibibyte (KiB) = 1024 bytes
-* 1 mebibyte (MiB) = 1024 kibibytes
-* 1 gibibyte (GiB) = 1024 mebibytes
-* 1 tebibyte (TiB) = 1024 gibibytes
-* 1 pebibyte (PiB) = 1024 tebibyte
+  - 1 byte (B)
+  - 1 kibibyte (KiB) = 1024 bytes
+  - 1 mebibyte (MiB) = 1024 kibibytes
+  - 1 gibibyte (GiB) = 1024 mebibytes
+  - 1 tebibyte (TiB) = 1024 gibibytes
+  - 1 pebibyte (PiB) = 1024 tebibyte
 
 Larger binary units (exbibyte (EiB), zebibyte (ZiB), yobibytej (YiB), ...)) are
 not supported.
@@ -49,12 +47,14 @@ the next larger unit. For binary/base 2 units, the number of bytes is divided by
 2^10 (1024) each time. (For binary units also see
 <https://en.wikipedia.org/wiki/Kibibyte>.)
 
+
 ## Usage
+
 @docs format, formatWith, defaultSettings, Settings, Units
 
 -}
 
-import Regex exposing (Regex, HowMany(AtMost))
+import Regex exposing (HowMany(AtMost), Regex)
 import Round
 
 
@@ -66,15 +66,15 @@ type Units
     | Base2
 
 
-{-|
-Use a settings record together with `formatWith` to customize the formatting
+{-| Use a settings record together with `formatWith` to customize the formatting
 process. The available options are:
 
-* `units`: use either decimal or binary/IEC units (the default is to use decimal
-   units),
-* `decimalPlaces`: the number of decimal places (digits after the decimal
-   separator, the default is 2) and
-* `decimalSeparator`: the decimal separator to use (default ".").
+  - `units`: use either decimal or binary/IEC units (the default is to use decimal
+    units),
+  - `decimalPlaces`: the number of decimal places (digits after the decimal
+    separator, the default is 2) and
+  - `decimalSeparator`: the decimal separator to use (default ".").
+
 -}
 type alias Settings =
     { units : Units
@@ -113,9 +113,10 @@ base10UnitList =
     , { minimumSize = 1000000000000, abbreviation = "TB" }
     , { minimumSize = 1000000000000000, abbreviation = "PB" }
     , { minimumSize = 1000000000000000000, abbreviation = "EB" }
-      -- , { miniumVersion = 1000000000000000000000, abbreviation = "ZB" }
-      -- , { miniumVersion = 1000000000000000000000000, abbreviation = "YB" }
-      -- , ...
+
+    -- , { miniumVersion = 1000000000000000000000, abbreviation = "ZB" }
+    -- , { miniumVersion = 1000000000000000000000000, abbreviation = "YB" }
+    -- , ...
     ]
 
 
@@ -127,7 +128,8 @@ base2UnitList =
     , { minimumSize = 1073741824, abbreviation = "GiB" }
     , { minimumSize = 1099511627776, abbreviation = "TiB" }
     , { minimumSize = 1125899906842624, abbreviation = "PiB" }
-      -- , ...
+
+    -- , ...
     ]
 
 
@@ -188,11 +190,11 @@ formatWith settings num =
                     |> Maybe.withDefault unknownUnit
 
             formattedNumber =
-                (toFloat num2)
-                    / (toFloat unitDefinition.minimumSize)
+                toFloat num2
+                    / toFloat unitDefinition.minimumSize
                     |> roundToDecimalPlaces settings
         in
-            negativePrefix ++ formattedNumber ++ " " ++ unitDefinition.abbreviation
+        negativePrefix ++ formattedNumber ++ " " ++ unitDefinition.abbreviation
 
 
 roundToDecimalPlaces : Settings -> Float -> String
@@ -228,11 +230,11 @@ roundToDecimalPlaces settings num =
             else
                 withoutTrailingZeroes
     in
-        if (settings.decimalSeparator == ".") then
+    if settings.decimalSeparator == "." then
+        withoutTrailingDot
+    else
+        Regex.replace
+            (AtMost 1)
+            decimalSeparatorRegex
+            (\_ -> settings.decimalSeparator)
             withoutTrailingDot
-        else
-            Regex.replace
-                (AtMost 1)
-                decimalSeparatorRegex
-                (\_ -> settings.decimalSeparator)
-                withoutTrailingDot
