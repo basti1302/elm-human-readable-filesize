@@ -55,6 +55,7 @@ the next larger unit. For binary/base 2 units, the number of bytes is divided by
 -}
 
 import Regex exposing (Regex, HowMany(AtMost))
+import Round
 
 
 {-| The two possible unit types, either decimal/base 10 (kb, MB, GB, ...) or
@@ -150,6 +151,11 @@ decimalSeparatorRegex =
     "." |> Regex.escape |> Regex.regex
 
 
+removeTrailingZeroesRegex : Regex
+removeTrailingZeroesRegex =
+    Regex.regex "^(\\d+\\.[^0]*)(0+)$"
+
+
 {-| Formats the given file size with the default settings.
 -}
 format : Int -> String
@@ -192,28 +198,41 @@ formatWith settings num =
 roundToDecimalPlaces : Settings -> Float -> String
 roundToDecimalPlaces settings num =
     let
-        decimalPlaces =
-            if settings.decimalPlaces >= 0 then
-                settings.decimalPlaces
-            else
-                defaultSettings.decimalPlaces
-
-        factor =
-            (10 ^ (toFloat decimalPlaces))
-
-        -- Actually, using round instead of floor would be preferable but we
-        -- never want to round from 999.999 to 1000.
-        scaledValue =
-            num * factor |> floor |> toFloat
-
+        -- Actually, using Round.round instead of floor would be preferable but
+        -- we never want to round from 999.999 to 1000 because then we would
+        -- combine the number with the wrong unit (the proper unit has been
+        -- calculated before rounding). Maybe we should switch rounding and unit
+        -- selection to avoid this?
         rounded =
-            toString (scaledValue / factor)
+            Round.floor {- option -} settings.decimalPlaces num
+
+        -- TODO all this removal of trailing zeroes, trailing dots and replacing
+        -- of the decimal separator should be options that elm-round provides.
+        -- https://github.com/myrho/elm-round/pull/2 makes the start, let's see
+        -- how this goes.
+        withoutTrailingZeroes =
+            Regex.replace
+                (AtMost 1)
+                removeTrailingZeroesRegex
+                (\{ submatches } ->
+                    submatches
+                        |> List.take 1
+                        |> List.map (Maybe.withDefault "")
+                        |> String.join ""
+                )
+                rounded
+
+        withoutTrailingDot =
+            if String.endsWith "." withoutTrailingZeroes then
+                String.dropRight 1 withoutTrailingZeroes
+            else
+                withoutTrailingZeroes
     in
         if (settings.decimalSeparator == ".") then
-            rounded
+            withoutTrailingDot
         else
             Regex.replace
                 (AtMost 1)
                 decimalSeparatorRegex
                 (\_ -> settings.decimalSeparator)
-                rounded
+                withoutTrailingDot

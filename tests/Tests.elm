@@ -136,12 +136,7 @@ all =
                         (num |> format |> String.startsWith "-")
             ]
         , describe "With settings (decimalPlaces)"
-            [ test "ignore negative decimal places" <|
-                \() ->
-                    Expect.equal
-                        "238.67 MB"
-                        (formatWith { defaultSettings | decimalPlaces = -3 } 238674052)
-            , test "zero decimal places" <|
+            [ test "zero decimal places" <|
                 \() ->
                     Expect.equal
                         "238 MB"
@@ -166,6 +161,16 @@ all =
                     Expect.equal
                         "238.67405 MB"
                         (formatWith { defaultSettings | decimalPlaces = 5 } 238674052)
+            , test "use negative decimal places to round 1" <|
+                \() ->
+                    Expect.equal
+                        "230 MB"
+                        (formatWith { defaultSettings | decimalPlaces = -1 } 238674052)
+            , test "use negative decimal places to round 2" <|
+                \() ->
+                    Expect.equal
+                        "200 MB"
+                        (formatWith { defaultSettings | decimalPlaces = -2 } 238674052)
             ]
         , describe "With settings (decimalSeparator)"
             [ test "use comma as decimal separator" <|
