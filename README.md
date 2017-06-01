@@ -14,6 +14,7 @@ See [package documentation](http://package.elm-lang.org/packages/basti1302/elm-h
 
 ## Releases
 
+* 1.1.0 - 2017-06-01: Expose `formatBase2` as a convenience function (alias for `formatWith { defaultSettings | units = Base2 }`.
 * 1.0.1 - 2017-06-01: Use [myrho/elm-round](http://package.elm-lang.org/packages/myrho/elm-round/latest/) internally for rounding.
 * 1.0.0 - 2017-03-08: Initial release
 
