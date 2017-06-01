@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "summary": "Converts file size in bytes to a human readable string",
     "repository": "https://github.com/basti1302/elm-human-readable-filesize.git",
     "license": "BSD3-Clause",
