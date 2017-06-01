@@ -29,16 +29,18 @@ all =
             , test "1 TB" <| \() -> Expect.equal "1 TB" (format 1000000000000)
             , test "999.99 TB" <| \() -> Expect.equal "999.99 TB" (format 999999999999999)
             , test "1 PB" <| \() -> Expect.equal "1 PB" (format 1000000000000000)
-              -- TODO For very large file sizes, the implementation of
-              -- roundToDecimalPlaces can introduce rounding errors that lead to
-              -- different results. Therefore, for now, we test with
-              -- 999999999999999000 instead of 999999999999999999.
+
+            -- TODO For very large file sizes, the implementation of
+            -- roundToDecimalPlaces can introduce rounding errors that lead to
+            -- different results. Therefore, for now, we test with
+            -- 999999999999999000 instead of 999999999999999999.
             , test "999.99 PB" <| \() -> Expect.equal "999.99 PB" (format 999999999999999000)
             , test "1 EB" <| \() -> Expect.equal "1 EB" (format 1000000000000000000)
-              -- Somewhere around this (9223350000000000000) elm-format
-              -- overwrites the Int literal with garbage, possibly due to an
-              -- integer overflow. In order to keep this file editable with
-              -- elm-format enabled, we do not use larger Ints in our tests.
+
+            -- Somewhere around this (9223350000000000000) elm-format
+            -- overwrites the Int literal with garbage, possibly due to an
+            -- integer overflow. In order to keep this file editable with
+            -- elm-format enabled, we do not use larger Ints in our tests.
             , test "922.33 EB" <| \() -> Expect.equal "9.22 EB" (format 9223350000000000000)
             ]
         , describe "Basic negative cases"

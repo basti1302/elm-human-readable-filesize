@@ -4,8 +4,8 @@ module Filesize
         , Units(..)
         , defaultSettings
         , format
-        , formatWith
         , formatBase2
+        , formatWith
         )
 
 {-| This library converts a file size in bytes into a human readable string.
@@ -51,7 +51,7 @@ the next larger unit. For binary/base 2 units, the number of bytes is divided by
 
 ## Usage
 
-@docs format, formatWith, defaultSettings, Settings, Units
+@docs format, formatBase2, formatWith, defaultSettings, Settings, Units
 
 -}
 
@@ -114,9 +114,10 @@ base10UnitList =
     , { minimumSize = 1000000000000, abbreviation = "TB" }
     , { minimumSize = 1000000000000000, abbreviation = "PB" }
     , { minimumSize = 1000000000000000000, abbreviation = "EB" }
-      -- , { miniumVersion = 1000000000000000000000, abbreviation = "ZB" }
-      -- , { miniumVersion = 1000000000000000000000000, abbreviation = "YB" }
-      -- , ...
+
+    -- , { miniumVersion = 1000000000000000000000, abbreviation = "ZB" }
+    -- , { miniumVersion = 1000000000000000000000000, abbreviation = "YB" }
+    -- , ...
     ]
 
 
@@ -128,7 +129,8 @@ base2UnitList =
     , { minimumSize = 1073741824, abbreviation = "GiB" }
     , { minimumSize = 1099511627776, abbreviation = "TiB" }
     , { minimumSize = 1125899906842624, abbreviation = "PiB" }
-      -- , ...
+
+    -- , ...
     ]
 
 
@@ -164,7 +166,7 @@ format =
     formatWith defaultSettings
 
 
-{-| Formats the given file size with the Base2 unit.
+{-| Formats the given file size with the binary/base2/IEC unit.
 -}
 formatBase2 : Int -> String
 formatBase2 =
@@ -200,7 +202,7 @@ formatWith settings num =
                     / toFloat unitDefinition.minimumSize
                     |> roundToDecimalPlaces settings
         in
-            negativePrefix ++ formattedNumber ++ " " ++ unitDefinition.abbreviation
+        negativePrefix ++ formattedNumber ++ " " ++ unitDefinition.abbreviation
 
 
 roundToDecimalPlaces : Settings -> Float -> String
@@ -236,11 +238,11 @@ roundToDecimalPlaces settings num =
             else
                 withoutTrailingZeroes
     in
-        if settings.decimalSeparator == "." then
+    if settings.decimalSeparator == "." then
+        withoutTrailingDot
+    else
+        Regex.replace
+            (AtMost 1)
+            decimalSeparatorRegex
+            (\_ -> settings.decimalSeparator)
             withoutTrailingDot
-        else
-            Regex.replace
-                (AtMost 1)
-                decimalSeparatorRegex
-                (\_ -> settings.decimalSeparator)
-                withoutTrailingDot
