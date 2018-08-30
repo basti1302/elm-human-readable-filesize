@@ -12,7 +12,7 @@ os:
 
 env:
   matrix:
-    - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=node NODE_TEST_RUNNER_VERSION=0.18.4 ELM_OPS_TOOLING_HASH=8701cf74016281814a3da784e19b4a0117493c46
+    - ELM_VERSION=0.19.0-bugfix2 TARGET_NODE_VERSION=node NODE_TEST_RUNNER_VERSION=0.19.0-beta5 ELM_OPS_TOOLING_HASH=8701cf74016281814a3da784e19b4a0117493c46
 
 before_install:
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config

@@ -1,19 +1,13 @@
-module Filesize
-    exposing
-        ( Settings
-        , Units(..)
-        , defaultSettings
-        , format
-        , formatBase2
-        , formatWith
-        )
+module Filesize exposing (format, formatBase2, formatWith, defaultSettings, Settings, Units(..))
 
 {-| This library converts a file size in bytes into a human readable string.
 
 Examples:
 
     format 1234 == "1.23 kB"
+
     format 238674052 == "238.67 MB"
+
     format 543 == "543 B"
 
 You can either use decimal units (also known as base 10 units, these are the
@@ -55,7 +49,7 @@ the next larger unit. For binary/base 2 units, the number of bytes is divided by
 
 -}
 
-import Regex exposing (HowMany(AtMost), Regex)
+import Regex exposing (HowMany(..), Regex)
 import Round
 
 
@@ -179,11 +173,13 @@ formatWith : Settings -> Int -> String
 formatWith settings num =
     if num == 0 then
         "0 B"
+
     else
         let
             ( num2, negativePrefix ) =
                 if num < 0 then
                     ( num |> negate, "-" )
+
                 else
                     ( num, "" )
 
@@ -235,11 +231,13 @@ roundToDecimalPlaces settings num =
         withoutTrailingDot =
             if String.endsWith "." withoutTrailingZeroes then
                 String.dropRight 1 withoutTrailingZeroes
+
             else
                 withoutTrailingZeroes
     in
     if settings.decimalSeparator == "." then
         withoutTrailingDot
+
     else
         Regex.replace
             (AtMost 1)
