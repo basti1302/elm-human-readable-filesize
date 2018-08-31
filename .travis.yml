@@ -27,7 +27,7 @@ install:
   - pushd elm-ops-tooling # fix elm-ops-tooling to a specific commit (reproducible builds ftw)
   - git reset --hard $ELM_OPS_TOOLING_HASH
   - popd
-  - elm-ops-tooling/with_retry.rb elm package install --yes
+  - elm-ops-tooling/with_retry.rb elm make
 
 script:
   - elm-test
