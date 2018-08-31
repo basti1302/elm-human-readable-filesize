@@ -49,7 +49,7 @@ the next larger unit. For binary/base 2 units, the number of bytes is divided by
 
 -}
 
-import Regex exposing (HowMany(..), Regex)
+import Regex exposing (Regex, replaceAtMost)
 import Round
 
 
@@ -145,12 +145,12 @@ unknownUnit =
 
 decimalSeparatorRegex : Regex
 decimalSeparatorRegex =
-    "." |> Regex.escape |> Regex.regex
+    "\\." |> Regex.fromString |> Maybe.withDefault Regex.never
 
 
 removeTrailingZeroesRegex : Regex
 removeTrailingZeroesRegex =
-    Regex.regex "^(\\d+\\.[^0]*)(0+)$"
+    "^(\\d+\\.[^0]*)(0+)$" |> Regex.fromString |> Maybe.withDefault Regex.never
 
 
 {-| Formats the given file size with the default settings.
@@ -173,13 +173,11 @@ formatWith : Settings -> Int -> String
 formatWith settings num =
     if num == 0 then
         "0 B"
-
     else
         let
             ( num2, negativePrefix ) =
                 if num < 0 then
                     ( num |> negate, "-" )
-
                 else
                     ( num, "" )
 
@@ -198,7 +196,7 @@ formatWith settings num =
                     / toFloat unitDefinition.minimumSize
                     |> roundToDecimalPlaces settings
         in
-        negativePrefix ++ formattedNumber ++ " " ++ unitDefinition.abbreviation
+            negativePrefix ++ formattedNumber ++ " " ++ unitDefinition.abbreviation
 
 
 roundToDecimalPlaces : Settings -> Float -> String
@@ -217,8 +215,7 @@ roundToDecimalPlaces settings num =
         -- https://github.com/myrho/elm-round/pull/2 makes the start, let's see
         -- how this goes.
         withoutTrailingZeroes =
-            Regex.replace
-                (AtMost 1)
+            Regex.replaceAtMost 1
                 removeTrailingZeroesRegex
                 (\{ submatches } ->
                     submatches
@@ -231,16 +228,13 @@ roundToDecimalPlaces settings num =
         withoutTrailingDot =
             if String.endsWith "." withoutTrailingZeroes then
                 String.dropRight 1 withoutTrailingZeroes
-
             else
                 withoutTrailingZeroes
     in
-    if settings.decimalSeparator == "." then
-        withoutTrailingDot
-
-    else
-        Regex.replace
-            (AtMost 1)
-            decimalSeparatorRegex
-            (\_ -> settings.decimalSeparator)
+        if settings.decimalSeparator == "." then
             withoutTrailingDot
+        else
+            Regex.replaceAtMost 1
+                decimalSeparatorRegex
+                (\_ -> settings.decimalSeparator)
+                withoutTrailingDot
