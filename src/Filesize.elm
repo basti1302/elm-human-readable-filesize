@@ -251,12 +251,8 @@ roundToDecimalPlaces settings num =
         -- calculated before rounding). Maybe we should switch rounding and unit
         -- selection to avoid this?
         rounded =
-            Round.floor {- option -} settings.decimalPlaces num
+            Round.floor settings.decimalPlaces num
 
-        -- TODO all this removal of trailing zeroes, trailing dots and replacing
-        -- of the decimal separator should be options that elm-round provides.
-        -- https://github.com/myrho/elm-round/pull/2 makes the start, let's see
-        -- how this goes.
         withoutTrailingZeroes =
             Regex.replaceAtMost 1
                 removeTrailingZeroesRegex
