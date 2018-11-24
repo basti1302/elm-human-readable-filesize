@@ -1,7 +1,4 @@
-module Filesize exposing
-    ( format, formatBase2, formatWith, defaultSettings, Settings, Units(..)
-    , formatBase2Split, formatSplit, formatWithSplit
-    )
+module Filesize exposing (format, formatSplit, formatBase2, formatBase2Split, formatWith, formatWithSplit, defaultSettings, Settings, Units(..))
 
 {-| This library converts a file size in bytes into a human readable string.
 
@@ -48,7 +45,7 @@ the next larger unit. For binary/base 2 units, the number of bytes is divided by
 
 ## Usage
 
-@docs format, formatBase2, formatWith, defaultSettings, Settings, Units
+@docs format, formatSplit, formatBase2, formatBase2Split, formatWith, formatWithSplit, defaultSettings, Settings, Units
 
 -}
 
