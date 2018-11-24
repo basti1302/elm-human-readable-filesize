@@ -1,4 +1,7 @@
-module Filesize exposing (format, formatBase2, formatWith, defaultSettings, Settings, Units(..))
+module Filesize exposing
+    ( format, formatBase2, formatWith, defaultSettings, Settings, Units(..)
+    , formatBase2Split, formatSplit, formatWithSplit
+    )
 
 {-| This library converts a file size in bytes into a human readable string.
 
@@ -154,10 +157,30 @@ removeTrailingZeroesRegex =
 
 
 {-| Formats the given file size with the default settings.
+
+Convenience function for
+
+    let
+        ( size, unit ) =
+            formatWithSplit settings num
+    in
+    size ++ " " ++ unit
+
 -}
 format : Int -> String
-format =
-    formatWith defaultSettings
+format num =
+    let
+        ( size, unit ) =
+            formatWithSplit defaultSettings num
+    in
+    size ++ " " ++ unit
+
+
+{-| Formats the given file size with the default settings, returning the number and units separately, in a tuple.
+-}
+formatSplit : Int -> ( String, String )
+formatSplit =
+    formatWithSplit defaultSettings
 
 
 {-| Formats the given file size with the binary/base2/IEC unit.
@@ -167,17 +190,37 @@ formatBase2 =
     formatWith { defaultSettings | units = Base2 }
 
 
+{-| Formats the given file size with the binary/base2/IEC unit, returning the number and units separately, in a tuple.
+-}
+formatBase2Split : Int -> ( String, String )
+formatBase2Split =
+    formatWithSplit { defaultSettings | units = Base2 }
+
+
 {-| Formats the given file size with the given settings.
 -}
 formatWith : Settings -> Int -> String
 formatWith settings num =
+    let
+        ( size, unit ) =
+            formatWithSplit settings num
+    in
+    size ++ " " ++ unit
+
+
+{-| Formats the given file size with the given settings, returning the number and units separately, in a tuple.
+-}
+formatWithSplit : Settings -> Int -> ( String, String )
+formatWithSplit settings num =
     if num == 0 then
-        "0 B"
+        ( "0", "B" )
+
     else
         let
             ( num2, negativePrefix ) =
                 if num < 0 then
                     ( num |> negate, "-" )
+
                 else
                     ( num, "" )
 
@@ -196,7 +239,7 @@ formatWith settings num =
                     / toFloat unitDefinition.minimumSize
                     |> roundToDecimalPlaces settings
         in
-            negativePrefix ++ formattedNumber ++ " " ++ unitDefinition.abbreviation
+        ( negativePrefix ++ formattedNumber, unitDefinition.abbreviation )
 
 
 roundToDecimalPlaces : Settings -> Float -> String
@@ -228,13 +271,15 @@ roundToDecimalPlaces settings num =
         withoutTrailingDot =
             if String.endsWith "." withoutTrailingZeroes then
                 String.dropRight 1 withoutTrailingZeroes
+
             else
                 withoutTrailingZeroes
     in
-        if settings.decimalSeparator == "." then
+    if settings.decimalSeparator == "." then
+        withoutTrailingDot
+
+    else
+        Regex.replaceAtMost 1
+            decimalSeparatorRegex
+            (\_ -> settings.decimalSeparator)
             withoutTrailingDot
-        else
-            Regex.replaceAtMost 1
-                decimalSeparatorRegex
-                (\_ -> settings.decimalSeparator)
-                withoutTrailingDot
